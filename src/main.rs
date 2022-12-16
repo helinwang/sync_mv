@@ -8,7 +8,6 @@ enum Action {
     B,
 }
 
-/// Simple program to greet a person
 #[derive(Parser, Debug)]
 #[command(about, long_about = None)]
 struct Args {
@@ -30,7 +29,7 @@ fn iterate(path: &str) -> Result<(), io::Error> {
                 println!("{}", path_str);
             }
         } else {
-            eprintln!("non utf-8 path: {:?}", path);
+            eprintln!("non UTF-8 path: {:?}", path);
         }
     }
 
