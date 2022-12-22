@@ -1,5 +1,7 @@
 use clap::Parser;
 use clap::ValueEnum;
+use std::collections::HashMap;
+use std::os::unix::prelude::MetadataExt;
 use std::{fs, io};
 
 #[derive(ValueEnum, Debug, Clone)]
@@ -18,18 +20,22 @@ struct Args {
     folder: String,
 }
 
-fn iterate(path: &str) -> Result<(), io::Error> {
+type Info = HashMap<String, u64>;
+
+fn iterate(path: &str, info: &mut Info) -> Result<(), io::Error> {
     for entry in fs::read_dir(path)? {
         let entry = entry?;
         let path = entry.path();
-        if let Some(path_str) = path.to_str() {
-            if path.is_dir() {
-                iterate(path_str)?;
+        if path.is_dir() {
+            if let Some(path_str) = path.to_str() {
+                iterate(path_str, info)?;
             } else {
-                println!("{}", path_str);
+                eprintln!("non UTF-8 path: {:?}", path);
             }
         } else {
-            eprintln!("non UTF-8 path: {:?}", path);
+            let name: String = path.to_str().unwrap().to_string();
+            let metadata = fs::metadata(path)?;
+            info.insert(name, metadata.size());
         }
     }
 
@@ -38,5 +44,7 @@ fn iterate(path: &str) -> Result<(), io::Error> {
 
 fn main() {
     let args = Args::parse();
-    iterate(&args.folder).unwrap();
+    let mut info = Info::new();
+    iterate(&args.folder, &mut info).unwrap();
+    println!("{:?}", info);
 }
