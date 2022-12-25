@@ -21,7 +21,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let summary = digest::get(&args.folder).unwrap();
-    for (path, size) in summary {
-        println!("{} {}", size, path);
+    for (path, metadata) in summary {
+        println!("{} {:?}", path, metadata);
     }
 }

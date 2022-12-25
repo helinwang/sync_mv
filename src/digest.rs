@@ -1,8 +1,15 @@
 use std::collections::HashMap;
 use std::os::unix::prelude::MetadataExt;
+use std::time::UNIX_EPOCH;
 use std::{fs, io};
 
-pub type Summary = HashMap<String, u64>;
+pub type Summary = HashMap<String, Metadata>;
+
+#[derive(Debug)]
+pub struct Metadata {
+    pub size: u64,
+    pub modified: u128,
+}
 
 fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
     for entry in fs::read_dir(path)? {
@@ -17,7 +24,18 @@ fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
         } else {
             let name: String = path.to_str().unwrap().to_string();
             let metadata = fs::metadata(path)?;
-            summary.insert(name, metadata.size());
+
+            summary.insert(
+                name,
+                Metadata {
+                    size: metadata.size(),
+                    modified: metadata
+                        .modified()?
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap()
+                        .as_nanos(),
+                },
+            );
         }
     }
 
