@@ -6,7 +6,7 @@ fn sync() {
     let src_json = r#"{
   "base_dir": "tests/test_data/src",
   "files": {
-    "/1.txt/1_.txt": {
+    "/1/1_.txt": {
       "size": 2,
       "modified": 1671944003613389535
     },
@@ -78,8 +78,8 @@ fn sync() {
     assert.success().stdout(
         r#"set -x
 set -e
-mkdir -p 'tests/test_data/dst/1.txt'
-mv 'tests/test_data/dst/1.txt' 'tests/test_data/dst/1.txt/1_.txt'
+mkdir -p 'tests/test_data/dst/1'
+mv 'tests/test_data/dst/1.txt' 'tests/test_data/dst/1/1_.txt'
 mkdir -p 'tests/test_data/dst'
 mv 'tests/test_data/dst/2.txt' 'tests/test_data/dst/2_.txt'
 "#,
