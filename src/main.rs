@@ -1,13 +1,13 @@
 use clap::Parser;
 use clap::ValueEnum;
-use serde_json;
 use std::fs;
-use sync_mv::digest;
+
+mod digest;
 
 #[derive(ValueEnum, Debug, Clone)]
 enum Action {
     Digest,
-    Generate,
+    Diff,
 }
 
 #[derive(Parser, Debug)]
@@ -26,23 +26,21 @@ struct Args {
     dst: Option<String>,
 }
 
-fn load_summary(path: &str) -> digest::Summary {
-    let content = fs::read_to_string(path).unwrap();
-    serde_json::from_str(&content).unwrap()
-}
-
 fn main() {
     let args = Args::parse();
 
     match args.action {
         Action::Digest => {
-            let summary = digest::get(&args.folder.unwrap()).unwrap();
-            print!("{}", serde_json::to_string(&summary).unwrap());
+            println!("{}", digest::get(&args.folder.unwrap()));
         }
-        Action::Generate => {
-            let src = load_summary(&args.src.unwrap());
-            let dst = load_summary(&args.dst.unwrap());
-            digest::diff(&src, &dst);
+        Action::Diff => {
+            println!(
+                "{}",
+                digest::diff(
+                    &fs::read_to_string(&args.src.unwrap()).unwrap(),
+                    &fs::read_to_string(&args.dst.unwrap()).unwrap()
+                )
+            );
         }
     }
 }

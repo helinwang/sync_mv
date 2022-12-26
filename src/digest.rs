@@ -1,26 +1,29 @@
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use serde_json;
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::os::unix::prelude::MetadataExt;
 use std::time::UNIX_EPOCH;
 use std::{fs, io};
 
 #[derive(Deserialize, Serialize, Eq, PartialEq, Hash, Copy, Clone, Debug)]
-pub struct Metadata {
-    pub size: u64,
-    pub modified: u128,
+struct Metadata {
+    size: u64,
+    modified: u128,
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct Summary {
+struct Summary {
     base_dir: String,
-    pub files: HashMap<String, Metadata>,
+
+    // use BTreeMap for deterministic JSON serialization, which helps testing
+    files: BTreeMap<String, Metadata>,
 }
 
 impl Summary {
-    pub fn new(base_dir: String) -> Self {
+    fn new(base_dir: String) -> Self {
         Summary {
             base_dir,
-            files: HashMap::new(),
+            files: BTreeMap::new(),
         }
     }
 
@@ -72,13 +75,15 @@ fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
     Ok(())
 }
 
-pub fn get(path: &str) -> Result<Summary, io::Error> {
+pub fn get(path: &str) -> String {
     let mut summary = Summary::new(path.to_string());
-    iterate(path, &mut summary)?;
-    Ok(summary)
+    iterate(path, &mut summary).unwrap();
+    serde_json::to_string_pretty(&summary).unwrap()
 }
 
-pub fn diff(src: &Summary, dst: &Summary) -> String {
+pub fn diff(src: &str, dst: &str) -> String {
+    let src: Summary = serde_json::from_str(&src).unwrap();
+    let dst: Summary = serde_json::from_str(&dst).unwrap();
     let mut metadata_to_path = MetadataToPath::new();
     for (path, metadata) in &dst.files {
         if src.files.contains_key(path) {
@@ -88,7 +93,7 @@ pub fn diff(src: &Summary, dst: &Summary) -> String {
         }
 
         if let Some(existing) = metadata_to_path.insert(*metadata, path.to_string()) {
-            println!(
+            eprintln!(
                 "replacing existing path from dst {} with {}",
                 existing, path
             );
