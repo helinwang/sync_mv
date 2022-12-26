@@ -74,8 +74,11 @@ fn sync() {
             dst.path().to_str().unwrap(),
         ])
         .assert();
+
     assert.success().stdout(
-        r#"mkdir -p 'tests/test_data/dst/1.txt'
+        r#"set -x
+set -e
+mkdir -p 'tests/test_data/dst/1.txt'
 mv 'tests/test_data/dst/1.txt' 'tests/test_data/dst/1.txt/1_.txt'
 mkdir -p 'tests/test_data/dst'
 mv 'tests/test_data/dst/2.txt' 'tests/test_data/dst/2_.txt'

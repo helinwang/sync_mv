@@ -116,6 +116,8 @@ pub fn diff(src: &str, dst: &str) -> String {
     }
 
     let mut lines = Vec::<String>::new();
+    lines.push("set -x".to_string()); // print each command when executing
+    lines.push("set -e".to_string()); // stop when there is error
     let mut mkdir_done = HashSet::<String>::new();
 
     for move_file in &moves {
