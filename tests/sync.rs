@@ -2,13 +2,15 @@ use sync_mv::digest;
 
 #[test]
 fn sync() {
-    let summary = digest::get("tests/test_data/src").unwrap();
-    for (path, metadata) in summary {
+    let src_summary = digest::get("tests/test_data/src").unwrap();
+    for (path, metadata) in &src_summary {
         println!("{}, {:?}", path, metadata);
     }
 
-    let summary = digest::get("tests/test_data/dst").unwrap();
-    for (path, metadata) in summary {
+    let dst_summary = digest::get("tests/test_data/dst").unwrap();
+    for (path, metadata) in &dst_summary {
         println!("{}, {:?}", path, metadata);
     }
+
+    digest::diff(&src_summary, &dst_summary);
 }
