@@ -2,8 +2,14 @@
 name = "sync_mv"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Helin Wang"]
+license = "MIT"
+repository = "https://github.com/helinwang/sync_mv"
+documentation = "https://docs.rs/sync_mv"
+description = """
+Binary that generates a script containing `mkdir` and `mv` commands that moves the files in the `dst` folder to match the file structure of the `src` folder.
+Run it before `rsync` to save copying files moved in the source folder.
+"""
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
