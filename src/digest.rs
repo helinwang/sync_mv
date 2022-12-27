@@ -45,33 +45,37 @@ fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
         Err(err) => eprintln!("can't read dir {} due to {}", path, err),
         Ok(dir) => {
             for entry in dir {
-                let entry = entry?;
-                let path = entry.path();
-                if path.is_dir() {
-                    if let Some(path_str) = path.to_str() {
-                        iterate(path_str, summary)?;
-                    } else {
-                        eprintln!("ignored non UTF-8 folder: {:?}", path);
+                match entry {
+                    Err(err) => eprintln!("can't read entry from dir {} due to {}", path, err),
+                    Ok(entry) => {
+                        let path = entry.path();
+                        if path.is_dir() {
+                            if let Some(path_str) = path.to_str() {
+                                iterate(path_str, summary)?;
+                            } else {
+                                eprintln!("ignored non UTF-8 folder: {:?}", path);
+                            }
+                        } else {
+                            let name: String = if let Some(path_str) = path.to_str() {
+                                path_str.to_string()
+                            } else {
+                                eprintln!("ignored non UTF-8 file: {:?}", path);
+                                continue;
+                            };
+
+                            let metadata = fs::metadata(path)?;
+
+                            summary.add_file(
+                                name,
+                                metadata.size(),
+                                metadata
+                                    .modified()?
+                                    .duration_since(UNIX_EPOCH)
+                                    .unwrap()
+                                    .as_nanos(),
+                            );
+                        }
                     }
-                } else {
-                    let name: String = if let Some(path_str) = path.to_str() {
-                        path_str.to_string()
-                    } else {
-                        eprintln!("ignored non UTF-8 file: {:?}", path);
-                        continue;
-                    };
-
-                    let metadata = fs::metadata(path)?;
-
-                    summary.add_file(
-                        name,
-                        metadata.size(),
-                        metadata
-                            .modified()?
-                            .duration_since(UNIX_EPOCH)
-                            .unwrap()
-                            .as_nanos(),
-                    );
                 }
             }
         }
