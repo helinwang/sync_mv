@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::{BTreeMap, HashMap, HashSet};
+use std::fs;
 use std::os::unix::prelude::MetadataExt;
 use std::time::UNIX_EPOCH;
-use std::{fs, io};
 
 #[derive(Deserialize, Serialize, Eq, PartialEq, Hash, Copy, Clone, Debug)]
 struct Metadata {
@@ -40,7 +40,7 @@ impl Summary {
 
 type MetadataToPath = HashMap<Metadata, String>;
 
-fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
+fn iterate(path: &str, summary: &mut Summary) {
     match fs::read_dir(path) {
         Err(err) => eprintln!("can't read dir {} due to {}", path, err),
         Ok(dir) => {
@@ -51,7 +51,7 @@ fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
                         let path = entry.path();
                         if path.is_dir() {
                             if let Some(path_str) = path.to_str() {
-                                iterate(path_str, summary)?;
+                                iterate(path_str, summary);
                             } else {
                                 eprintln!("ignored non UTF-8 folder: {:?}", path);
                             }
@@ -88,13 +88,11 @@ fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
             }
         }
     }
-
-    Ok(())
 }
 
 pub fn get(path: &str) -> String {
     let mut summary = Summary::new(path.to_string());
-    iterate(path, &mut summary).unwrap();
+    iterate(path, &mut summary);
     serde_json::to_string_pretty(&summary).unwrap()
 }
 

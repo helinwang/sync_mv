@@ -26,6 +26,8 @@ struct Args {
     dst: Option<String>,
 }
 
+/// Known issues:
+/// 1. the generated `mkdir -p` could fail due to a path exists
 fn main() {
     let args = Args::parse();
 
