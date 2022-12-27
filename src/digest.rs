@@ -47,15 +47,6 @@ impl Summary {
 type MetadataToPath = HashMap<Metadata, String>;
 
 fn iterate(path: &str, summary: &mut Summary) {
-    match fs::symlink_metadata(path) {
-        Err(err) => eprintln!("can't get symlink status for {} due to {}", path, err),
-        Ok(metadata) => {
-            if metadata.is_symlink() {
-                return;
-            }
-        }
-    }
-
     match fs::read_dir(path) {
         Err(err) => eprintln!("can't read dir {} due to {}", path, err),
         Ok(dir) => {
@@ -77,6 +68,19 @@ fn iterate(path: &str, summary: &mut Summary) {
                                 eprintln!("ignored non UTF-8 file: {:?}", path);
                                 continue;
                             };
+
+                            match fs::symlink_metadata(path.clone()) {
+                                Err(err) => eprintln!(
+                                    "can't get symlink status for {} due to {}",
+                                    path.to_str().unwrap(),
+                                    err
+                                ),
+                                Ok(metadata) => {
+                                    if metadata.is_symlink() {
+                                        return;
+                                    }
+                                }
+                            }
 
                             match fs::metadata(path.clone()) {
                                 Err(err) => {
