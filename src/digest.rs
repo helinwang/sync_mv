@@ -76,7 +76,7 @@ fn iterate(path: &str, summary: &mut Summary) {
                                 ),
                                 Ok(metadata) => {
                                     if metadata.is_symlink() {
-                                        return;
+                                        continue;
                                     }
                                 }
                             }
