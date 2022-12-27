@@ -20,6 +20,9 @@ struct Args {
     folder: Option<String>,
 
     #[arg(short, long)]
+    min_file_size: Option<u64>,
+
+    #[arg(short, long)]
     src: Option<String>,
 
     #[arg(short, long)]
@@ -33,7 +36,8 @@ fn main() {
 
     match args.action {
         Action::Digest => {
-            println!("{}", digest::get(&args.folder.unwrap()));
+            let min_file_size = args.min_file_size.unwrap_or(1_000_000);
+            println!("{}", digest::get(&args.folder.unwrap(), min_file_size));
         }
         Action::Diff => {
             println!(

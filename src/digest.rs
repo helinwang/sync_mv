@@ -14,20 +14,26 @@ struct Metadata {
 #[derive(Deserialize, Serialize)]
 struct Summary {
     base_dir: String,
+    min_file_bytes: u64,
 
     // use BTreeMap for deterministic JSON serialization, which helps testing
     files: BTreeMap<String, Metadata>,
 }
 
 impl Summary {
-    fn new(base_dir: String) -> Self {
+    fn new(base_dir: String, min_file_bytes: u64) -> Self {
         Summary {
             base_dir,
+            min_file_bytes,
             files: BTreeMap::new(),
         }
     }
 
     fn add_file(&mut self, path: String, size: u64, modified: u128) {
+        if size < self.min_file_bytes {
+            return;
+        }
+
         let relative_path = path[path
             .find(&self.base_dir)
             .expect("path must contain base dir")
@@ -90,8 +96,8 @@ fn iterate(path: &str, summary: &mut Summary) {
     }
 }
 
-pub fn get(path: &str) -> String {
-    let mut summary = Summary::new(path.to_string());
+pub fn get(path: &str, min_file_size: u64) -> String {
+    let mut summary = Summary::new(path.to_string(), min_file_size);
     iterate(path, &mut summary);
     serde_json::to_string_pretty(&summary).unwrap()
 }

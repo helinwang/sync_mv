@@ -50,13 +50,27 @@ fn sync() {
 "#;
     let assert = Command::cargo_bin("sync_mv")
         .unwrap()
-        .args(&["--action", "digest", "--folder", "tests/test_data/src"])
+        .args(&[
+            "--action",
+            "digest",
+            "--folder",
+            "tests/test_data/src",
+            "--min-file-size",
+            "0",
+        ])
         .assert();
     assert.success().stdout(src_json);
 
     let assert = Command::cargo_bin("sync_mv")
         .unwrap()
-        .args(&["--action", "digest", "--folder", "tests/test_data/dst"])
+        .args(&[
+            "--action",
+            "digest",
+            "--folder",
+            "tests/test_data/dst",
+            "--min-file-size",
+            "0",
+        ])
         .assert();
     assert.success().stdout(dst_json);
 
