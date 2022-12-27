@@ -47,6 +47,15 @@ impl Summary {
 type MetadataToPath = HashMap<Metadata, String>;
 
 fn iterate(path: &str, summary: &mut Summary) {
+    match fs::symlink_metadata(path) {
+        Err(err) => eprintln!("can't get symlink status for {} due to {}", path, err),
+        Ok(metadata) => {
+            if metadata.is_symlink() {
+                return;
+            }
+        }
+    }
+
     match fs::read_dir(path) {
         Err(err) => eprintln!("can't read dir {} due to {}", path, err),
         Ok(dir) => {
@@ -130,6 +139,7 @@ pub fn diff(src: &str, dst: &str) -> String {
         from: String,
         to: String,
     }
+
     let mut moves = Vec::<Move>::new();
     let mut already_moved = HashMap::<String, String>::new();
 
