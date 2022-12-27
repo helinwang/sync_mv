@@ -147,6 +147,12 @@ pub fn diff(src: &str, dst: &str) -> String {
     let mut already_moved = HashMap::<String, String>::new();
 
     for (path, metadata) in &src.files {
+        if dst.files.contains_key(path) {
+            // Ignore src file alredy in dst, regardless if they are the same or not. This prevents
+            // the generated `mv` command overrding anything.
+            continue;
+        }
+
         if let Some(dst_path) = metadata_to_path.get(metadata) {
             if let Some(moved_to) = already_moved.get(dst_path) {
                 eprintln!(
