@@ -131,9 +131,20 @@ pub fn diff(src: &str, dst: &str) -> String {
         to: String,
     }
     let mut moves = Vec::<Move>::new();
+    let mut already_moved = HashMap::<String, String>::new();
 
     for (path, metadata) in &src.files {
         if let Some(dst_path) = metadata_to_path.get(metadata) {
+            if let Some(moved_to) = already_moved.get(dst_path) {
+                eprintln!(
+                    "ignored moving {} to {} since it's already moved to {}",
+                    dst_path, path, moved_to
+                );
+                continue;
+            }
+
+            already_moved.insert(dst_path.to_string(), path.to_string());
+
             moves.push(Move {
                 from: format!("{}{}", dst.base_dir, dst_path),
                 to: format!("{}{}", dst.base_dir, path),
