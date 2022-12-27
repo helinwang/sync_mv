@@ -63,18 +63,25 @@ fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
                                 continue;
                             };
 
-                            let metadata = fs::metadata(path).unwrap();
-
-                            summary.add_file(
-                                name,
-                                metadata.size(),
-                                metadata
-                                    .modified()
-                                    .unwrap()
-                                    .duration_since(UNIX_EPOCH)
-                                    .unwrap()
-                                    .as_nanos(),
-                            );
+                            match fs::metadata(path.clone()) {
+                                Err(err) => {
+                                    eprintln!(
+                                        "can't read metadata from {} due to {}",
+                                        path.to_str().unwrap(),
+                                        err
+                                    )
+                                }
+                                Ok(metadata) => summary.add_file(
+                                    name,
+                                    metadata.size(),
+                                    metadata
+                                        .modified()
+                                        .unwrap()
+                                        .duration_since(UNIX_EPOCH)
+                                        .unwrap()
+                                        .as_nanos(),
+                                ),
+                            }
                         }
                     }
                 }
