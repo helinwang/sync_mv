@@ -63,13 +63,14 @@ fn iterate(path: &str, summary: &mut Summary) -> Result<(), io::Error> {
                                 continue;
                             };
 
-                            let metadata = fs::metadata(path)?;
+                            let metadata = fs::metadata(path).unwrap();
 
                             summary.add_file(
                                 name,
                                 metadata.size(),
                                 metadata
-                                    .modified()?
+                                    .modified()
+                                    .unwrap()
                                     .duration_since(UNIX_EPOCH)
                                     .unwrap()
                                     .as_nanos(),
