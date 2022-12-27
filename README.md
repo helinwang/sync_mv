@@ -1,5 +1,6 @@
 # sync_mv
 
+## Overview
 Generates a script containing `mkdir` and `mv` commands that moves the files in the `dst` folder to
 match the file structure of the `src` folder.
 
@@ -34,4 +35,11 @@ bash diff.txt
 rsync -avh source_folder destination_folder
 ```
 
-License: MIT
+## Installation
+
+1. [install cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
+2. run `cargo install sync_mv`
+
+## License
+
+MIT
