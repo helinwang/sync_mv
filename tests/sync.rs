@@ -4,25 +4,26 @@ use temp_file;
 #[test]
 fn sync() {
     let src_json = r#"{
-  "base_dir": "tests/test_data/src",
+  "base_dir": "tests/test_data/src/",
+  "min_file_bytes": 0,
   "files": {
-    "/1/1_.txt": {
+    "1/1_.txt": {
       "size": 2,
       "modified": 1671944003613389535
     },
-    "/2_.txt": {
+    "2_.txt": {
       "size": 2,
       "modified": 1671944011717239623
     },
-    "/3.txt": {
+    "3.txt": {
       "size": 2,
       "modified": 1672027351079920913
     },
-    "/3_.txt": {
+    "3_.txt": {
       "size": 2,
       "modified": 1672027351079920913
     },
-    "/4.txt": {
+    "4.txt": {
       "size": 2,
       "modified": 1672027285744982980
     }
@@ -31,17 +32,18 @@ fn sync() {
 "#;
 
     let dst_json = r#"{
-  "base_dir": "tests/test_data/dst",
+  "base_dir": "tests/test_data/dst/",
+  "min_file_bytes": 0,
   "files": {
-    "/1.txt": {
+    "1.txt": {
       "size": 2,
       "modified": 1671944003613389535
     },
-    "/2.txt": {
+    "2.txt": {
       "size": 2,
       "modified": 1671944011717239623
     },
-    "/3.txt": {
+    "3.txt": {
       "size": 2,
       "modified": 1672027351079920913
     }

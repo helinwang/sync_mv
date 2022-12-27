@@ -21,9 +21,9 @@ struct Summary {
 }
 
 impl Summary {
-    fn new(base_dir: String, min_file_bytes: u64) -> Self {
+    fn new(base_dir: &str, min_file_bytes: u64) -> Self {
         Summary {
-            base_dir,
+            base_dir: base_dir.to_string(),
             min_file_bytes,
             files: BTreeMap::new(),
         }
@@ -96,9 +96,14 @@ fn iterate(path: &str, summary: &mut Summary) {
     }
 }
 
-pub fn get(path: &str, min_file_size: u64) -> String {
-    let mut summary = Summary::new(path.to_string(), min_file_size);
-    iterate(path, &mut summary);
+pub fn get(base_dir: &str, min_file_size: u64) -> String {
+    let mut base_dir = base_dir.to_string();
+    if !base_dir.ends_with("/") {
+        base_dir += "/";
+    }
+
+    let mut summary = Summary::new(&base_dir, min_file_size);
+    iterate(&base_dir, &mut summary);
     serde_json::to_string_pretty(&summary).unwrap()
 }
 
