@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use serde_json;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
 use std::os::unix::prelude::MetadataExt;
@@ -111,7 +110,7 @@ fn iterate(path: &str, summary: &mut Summary) {
 
 pub fn get(base_dir: &str, min_file_size: u64) -> String {
     let mut base_dir = base_dir.to_string();
-    if !base_dir.ends_with("/") {
+    if !base_dir.ends_with('/') {
         base_dir += "/";
     }
 
@@ -121,8 +120,8 @@ pub fn get(base_dir: &str, min_file_size: u64) -> String {
 }
 
 pub fn diff(src: &str, dst: &str) -> String {
-    let src: Summary = serde_json::from_str(&src).unwrap();
-    let dst: Summary = serde_json::from_str(&dst).unwrap();
+    let src: Summary = serde_json::from_str(src).unwrap();
+    let dst: Summary = serde_json::from_str(dst).unwrap();
     let mut metadata_to_path = MetadataToPath::new();
     for (path, metadata) in &dst.files {
         if src.files.contains_key(path) {
@@ -172,7 +171,7 @@ pub fn diff(src: &str, dst: &str) -> String {
     let mut mkdir_done = HashSet::<String>::new();
 
     for move_file in &moves {
-        let parent_dir = &move_file.to[0..move_file.to.rfind("/").unwrap()];
+        let parent_dir = &move_file.to[0..move_file.to.rfind('/').unwrap()];
         if mkdir_done.insert(parent_dir.to_string()) {
             lines.push(format!("mkdir -p '{}'", parent_dir));
         }
