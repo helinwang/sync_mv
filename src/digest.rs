@@ -68,7 +68,7 @@ fn iterate(path: &str, summary: &mut Summary) {
                                 continue;
                             };
 
-                            match fs::symlink_metadata(path.clone()) {
+                            match fs::symlink_metadata(&path) {
                                 Err(err) => eprintln!(
                                     "can't get symlink status for {} due to {}",
                                     path.to_str().unwrap(),
@@ -81,7 +81,7 @@ fn iterate(path: &str, summary: &mut Summary) {
                                 }
                             }
 
-                            match fs::metadata(path.clone()) {
+                            match fs::metadata(&path) {
                                 Err(err) => {
                                     eprintln!(
                                         "can't read metadata from {} due to {}",
